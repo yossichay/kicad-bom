@@ -23,6 +23,7 @@ class ComponentWrapper(object):
         'value': '1',
         'footprint': '2',
         'datasheet': '3',
+        'desc': '4'
     }
 
     def __init__(self, base_component):
@@ -62,11 +63,12 @@ class ComponentWrapper(object):
     def add_bom_fields(self):
 
         _fields = [
-            "MFR",
-            "MPN",
-            "SPR",
-            "SPN",
-	    "SPURL",
+            "Manufacturer",
+            "Manufacturer PN",
+            "Supplier",
+            "Supplier PN",
+            "Supplier URL",
+	    "Desc"
         ]
 
         for f in _fields:
@@ -139,43 +141,51 @@ class ComponentWrapper(object):
 
     @property
     def manufacturer(self):
-        return self._get_field_value('MFR')
+        return self._get_field_value('Manufacturer')
 
     @manufacturer.setter
     def manufacturer(self, mfr):
-        self._set_field_value('MFR', mfr)
+        self._set_field_value('Manufacturer', mfr)
 
     @property
     def supplier(self):
-        return self._get_field_value('SPR')
+        return self._get_field_value('Supplier')
 
     @supplier.setter
     def supplier(self, sup):
-        self._set_field_value('SPR', sup)
+        self._set_field_value('Supplier', sup)
 
     @property
     def manufacturer_pn(self):
-        return self._get_field_value('MPN')
+        return self._get_field_value('Manufacturer PN')
 
     @manufacturer_pn.setter
     def manufacturer_pn(self, pn):
-        self._set_field_value('MPN', pn)
+        self._set_field_value('Manufacturer PN', pn)
+
+    @property
+    def manufacturer_desc(self):
+        return self._get_field_value('Desc')
+
+    @manufacturer_desc.setter
+    def manufacturer_desc(self, desc):
+        self._set_field_value('Desc', desc)
 
     @property
     def supplier_pn(self):
-        return self._get_field_value('SPN')
+        return self._get_field_value('Supplier PN')
 
     @supplier_pn.setter
     def supplier_pn(self, pn):
-        self._set_field_value('SPN', pn)
+        self._set_field_value('Supplier PN', pn)
 
     @property
     def supplier_url(self):
-        return self._get_field_value('SPURL')
+        return self._get_field_value('Supplier URL')
 
     @supplier_url.setter
     def supplier_url(self, url):
-        self._set_field_value('SPURL', url)
+        self._set_field_value('Supplier URL', url)
 
     @property
     def unit(self):
@@ -275,6 +285,15 @@ class ComponentTypeContainer(object):
     def manufacturer_pn(self, pn):
         for c in self._components:
             c.manufacturer_pn = pn
+
+    @property
+    def manufacturer_desc(self):
+        return self._components[0].manufacturer_desc
+
+    @manufacturer_desc.setter
+    def manufacturer_desc(self, desc):
+        for c in self._components:
+            c.manufacturer_desc = desc
 
     @property
     def supplier(self):

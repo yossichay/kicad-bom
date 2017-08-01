@@ -58,6 +58,7 @@ class ManufacturerPart(Base):
     __tablename__ = 'manufacturer_part'
     id = Column(Integer, primary_key=True)
     pn = Column(String(64), nullable=False)
+    desc = Column(String(256), nullable=False)
     manufacturer_id = Column(Integer, ForeignKey('manufacturer.id'))
     manufacturer = relationship('Manufacturer')
     unique_part_id = Column(Integer, ForeignKey('unique_part.id'))
@@ -151,6 +152,11 @@ class Datastore(object):
             .filter(ManufacturerPart.pn == ct.manufacturer_pn)
         ).first()
 
+        desc = (
+            session.query(ManufacturerPart)
+            .filter(ManufacturerPart.desc == ct.manufacturer_desc)
+        ).first()
+
         spr = (
             session.query(Supplier)
             .filter(Supplier.name == ct.supplier)
@@ -180,6 +186,10 @@ class Datastore(object):
         if not mpn and len(ct.manufacturer_pn.strip()):
             mpn = ManufacturerPart(pn=ct.manufacturer_pn)
             session.add(mpn)
+
+        if not desc and len(ct.manufacturer_desc.strip()):
+            desc = ManufacturerPart(desc=ct.manufacturer_desc)
+            session.add(desc)
 
         if not spr and len(ct.supplier.strip()):
             spr = Supplier(name=ct.supplier)
