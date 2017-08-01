@@ -39,20 +39,21 @@ class ComponentTypeView(wx.Panel):
         vbox = wx.BoxSizer(wx.VERTICAL)
         self.parent = parent
         self._current_type = None
-        self.grid = wx.GridSizer(0, 2, 3, 3)
+        self.grid = wx.GridSizer(20, 2, 5,5)
 
-        self.lookup_button = wx.Button(self, 310, 'Part Lookup')
-        self.save_button = wx.Button(self, 311, 'Save Part to Datastore')
+        self.lookup_button = wx.Button(self, 311, 'Part Lookup')
+        self.save_button = wx.Button(self, 312, 'Save Part to Datastore')
 
         self.qty_text = wx.TextCtrl(self, 301, '', style=wx.TE_READONLY)
         self.refs_text = wx.TextCtrl(self, 302, '', style=wx.TE_READONLY)
         self.fp_text = wx.TextCtrl(self, 303, '', style=wx.TE_READONLY)
         self.value_text = wx.TextCtrl(self, 304, '')
-        self.ds_text = wx.TextCtrl(self, 305, '')
-        self.mfr_text = wx.TextCtrl(self, 306, '')
-        self.mpn_text = wx.TextCtrl(self, 307, '')
-        self.spr_text = wx.TextCtrl(self, 308, '')
-        self.spn_text = wx.TextCtrl(self, 309, '')
+        self.desc_text = wx.TextCtrl(self, 305, '')
+        self.ds_text = wx.TextCtrl(self, 306, '')
+        self.mfr_text = wx.TextCtrl(self, 307, '')
+        self.mpn_text = wx.TextCtrl(self, 308, '')
+        self.spr_text = wx.TextCtrl(self, 309, '')
+        self.spn_text = wx.TextCtrl(self, 310, '')
 
         # Bind the save and lookup component buttons
         self.save_button.Bind(wx.EVT_BUTTON, self.on_save_to_datastore, id=wx.ID_ANY)
@@ -93,7 +94,7 @@ class ComponentTypeView(wx.Panel):
         selbox.Add(compbox, 1, wx.EXPAND)
 
         # Perform final layout
-        vbox.Add(self.grid, 1, wx.EXPAND | wx.ALL, 3)
+        vbox.Add(self.grid, 3, wx.EXPAND | wx.ALL, 3)
         vbox.Add(selbox, 3, wx.EXPAND | wx.ALL, 3)
 
         self.SetSizer(vbox)
@@ -111,6 +112,8 @@ class ComponentTypeView(wx.Panel):
             (self.fp_text, 0, wx.EXPAND),
             (wx.StaticText(self, -1, 'Value'), 0, wx.EXPAND),
             (self.value_text, 0, wx.EXPAND),
+            (wx.StaticText(self, -1, 'Description'), 0, wx.EXPAND),
+            (self.desc_text, 0, wx.EXPAND),
             (wx.StaticText(self, -1, 'Datasheet'), 0, wx.EXPAND),
             (self.ds_text, 0, wx.EXPAND),
             (wx.StaticText(self, -1, 'Manufacturer'), 0, wx.EXPAND),
@@ -134,6 +137,7 @@ class ComponentTypeView(wx.Panel):
         self._current_type.datasheet = self.ds_text.GetValue()
         self._current_type.manufacturer = self.mfr_text.GetValue()
         self._current_type.manufacturer_pn = self.mpn_text.GetValue()
+        self._current_type.manufacturer_desc = self.desc_text.GetValue()
         self._current_type.supplier = self.spr_text.GetValue()
         self._current_type.supplier_pn = self.spn_text.GetValue()
 
@@ -244,6 +248,7 @@ class ComponentTypeView(wx.Panel):
         self.ds_text.SetValue(comp.datasheet)
         self.mfr_text.SetValue(comp.manufacturer)
         self.mpn_text.SetValue(comp.manufacturer_pn)
+        self.desc_text.SetValue(comp.manufacturer_desc)
         self.spr_text.SetValue(comp.supplier)
         self.spn_text.SetValue(comp.supplier_pn)
 
@@ -470,6 +475,12 @@ class MainFrame(wx.Frame):
                 if c.is_virtual:
                     continue
 
+#                try:
+#                    if not c.manufacturer_desc:
+#                        c.manufacturer_desc = '~'
+#                except:
+#                    c.manufacturer_desc = '~'
+
                 # Skip anything that is missing either a value or a
                 # footprint
                 if not c.has_valid_key_fields:
@@ -546,17 +557,18 @@ class MainFrame(wx.Frame):
         with open(base+ext, 'w') as csvfile:
             wrt = csv.writer(csvfile)
 
-            wrt.writerow(['Refs', 'Value', 'Footprint',
-                          'QTY', 'MFR', 'MPN', 'SPR', 'SPN'])
+            wrt.writerow(['Refs', 'QTY', 'Value', 'Description', 'Footprint',
+                          'Manufacturer', 'Manufacturer PN', 'Supplier', 'Supplier PN'])
 
             for fp in sorted(self.component_type_map):
                 for val in sorted(self.component_type_map[fp]):
                     ctcont = self.component_type_map[fp][val]
                     wrt.writerow([
                         ctcont.refs,
-                        ctcont.value,
-                        ctcont.footprint,
                         len(ctcont),
+                        ctcont.value,
+                        ctcont.manufacturer_desc,
+                        ctcont.footprint,
                         ctcont.manufacturer,
                         ctcont.manufacturer_pn,
                         ctcont.supplier,
