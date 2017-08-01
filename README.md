@@ -1,7 +1,7 @@
 # BOMs Away! - BOM/Component manager for KiCad
 
 dfsvfasdvfa
-
+afaga
 
 
 IMO, KiCad is one of the best EDA tools out there, with just one major
